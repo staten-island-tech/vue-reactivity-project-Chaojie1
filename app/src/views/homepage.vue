@@ -1,6 +1,14 @@
 <template>
     <div>
-        <Shopitem v-if="shopopen" v-for="item in shop" :key="item.item" :item="item" :boosts="boosts" />
+         <div>
+            <div v-if="shopopen" v-for="item in shop" :key="item.item">
+                <h2>{{ item.item }}</h2>
+                <p>{{ item.effect }}</p>
+                <p>You have {{ boosts[item.item] }} of this item.</p>
+                <p>Price: ${{ item.price }}</p>
+                <button @click="buyItem(item.item)">Buy</button>
+            </div>
+        </div>
         <button v-if="shopopen" @click="shopopen = !shopopen">Close Shop</button>
         <button v-else @click="shopopen = !shopopen">Open Shop</button>
         <h3>Money: ${{ money }}</h3>
@@ -10,32 +18,35 @@
 </template>
 
 <script setup>
-    import Shopitem from '@/components/shopitem.vue'
     import { ref, reactive } from 'vue'
     const shop = reactive([
         {
             item: 'Bounty Multiplier',
             effect: "Increases base money gain by 1",
             img: '',
-            price: 10
+            price: 10,
+            max: 100000000
         },
         {
             item: 'Shot Size',
             effect: "Increases area of click by 1, Max of 20",
             img: '',
-            price: 10
+            price: 10,
+            max: 20
         },
         {
             item: 'Greater Yield',
             effect: "Increases money gain by 1.1x compounding",
             img: '',
-            price: 10
+            price: 10,
+            max: 100000000
         },
         {
             item: 'Stronger Ammunition',
             effect: "Deal 1 extra damage per shot",
             img: '',
-            price: 10
+            price: 10,
+            max: 100000000
         }
     ])
     const boosts = reactive({
@@ -56,20 +67,20 @@
             currentenemystats.dead = false;
             currentenemystats.health = currentenemystats.maxhealth;
             button.textContent = `hp: ${currentenemystats.health}/${currentenemystats.maxhealth}`;
-            return
         } else {
             currentenemystats.health -= (1 + boosts["Stronger Ammunition"]);
             button.textContent = `hp: ${currentenemystats.health}/${currentenemystats.maxhealth}`;
-            const max = [window.innerWidth  - button.offsetWidth,window.innerHeight - button.offsetHeight];
-            const newpos = [Math.round(Math.random() * 250)*((-1)**Math.ceil(Math.random() * 4)),Math.round(Math.random() * 250)*((-1)**Math.ceil(Math.random() * 4))]
-            //button.style.transform = `translate(${clamp(0,max[0],newpos[0]+max[0]/2)}px, ${clamp(0,max[1],newpos[1]+max[1]/2)}px)`;
         }
         if (currentenemystats.health <= 0) {
             currentenemystats.dead = true;
             button.textContent = "collect corpse";
+            return
         }
+        const max = [window.innerWidth  - button.offsetWidth,window.innerHeight - button.offsetHeight];
+        const newpos = [Math.round(Math.random() * 250)*((-1)**Math.ceil(Math.random() * 4)),Math.round(Math.random() * 250)*((-1)**Math.ceil(Math.random() * 4))]
+        button.style.transform = `translate(${clamp(0,max[0],newpos[0]+max[0]/2)}px, ${clamp(0,max[1],newpos[1]+max[1]/2)}px)`;
     }
-    export function buyItem(item){
+    function buyItem(item){
         const index = shop.find(i => i.item === item);
         if(money.value >= index.price){
             money.value -= index.price;
@@ -85,5 +96,4 @@
 </script>
 
 <style scoped>
-    @import 'tailwindcss';
 </style>
