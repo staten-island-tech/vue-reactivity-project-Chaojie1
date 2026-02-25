@@ -12,11 +12,7 @@
     <button class="toggle-shop" @click="shopopen = !shopopen">{{ shopopen ? "Close Shop" : "Open Shop" }}</button>
     <div class="stats">
       <h3>Money: ${{ money.toFixed(2) }}</h3>
-      <h3>
-        Money Gain: $
-        {{ ((1 + boosts["Bounty Multiplier"]) *
-          (1.1 ** boosts["Greater Yield"])).toFixed(2) }}
-      </h3>
+      <h3>Money Gain: ${{ ((1 + boosts["Bounty Multiplier"])*(1.1 ** boosts["Greater Yield"])).toFixed(2) }}</h3>
       <h3>Enemy Level: {{ currentenemystats.level }}</h3>
     </div>
     <div class="collect">Drop Corpse Here</div>
@@ -37,19 +33,19 @@ const shop = reactive([
   {
     item: 'Bounty Multiplier',
     effect: "Increases base money gain by 1",
-    price: 10,
+    price: 5,
     max: 999999
   },
   {
     item: 'Greater Yield',
     effect: "Increases money gain by 1.1x compounding",
-    price: 15,
+    price: 8,
     max: 999999
   },
   {
     item: 'Stronger Ammunition',
     effect: "Deal 1 extra damage per shot",
-    price: 20,
+    price: 10,
     max: 999999
   }
 ])
@@ -126,6 +122,7 @@ onMounted(() => {
   moveEnemy()
 })
 </script>
+<!-- I DID NOT MAKE ANY OF THIS CSS, I ONLY DID BACKEND -->
 <style scoped>
 .game {
   font-family: Arial, sans-serif;
