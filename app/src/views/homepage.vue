@@ -47,16 +47,23 @@ const shop = reactive([
     effect: "Deal 1 extra damage per shot",
     price: 10,
     max: 999999
+  },
+  {
+    item: 'Tranquilizer Improvements',
+    effect: "Decreases the enemy's movement area by +5%",
+    price: 15,
+    max: 15
   }
 ])
 const boosts = reactive({
   "Bounty Multiplier": 0,
   "Greater Yield": 0,
-  "Stronger Ammunition": 0
+  "Stronger Ammunition": 0,
+  "Tranquilizer Improvements":0,
 })
 const currentenemystats = reactive({
-  health: 3,
-  maxhealth: 3,
+  health: 1,
+  maxhealth: 1,
   dead: false,
   level: 1
 })
@@ -70,8 +77,10 @@ function moveEnemy() {
   const padding = 200
   const maxX = window.innerWidth - padding
   const maxY = window.innerHeight - padding
-  enemyPosition.x = Math.random() * maxX
-  enemyPosition.y = Math.random() * maxY
+  const minX = maxX * (boosts["Tranquilizer Improvements"]*0.05)
+  const minY = maxY * (boosts["Tranquilizer Improvements"]*0.05)
+  enemyPosition.x = Math.max((Math.random() * maxX) * (1-boosts["Tranquilizer Improvements"]*0.05),minX)
+  enemyPosition.y = Math.max((Math.random() * maxY) * (1-boosts["Tranquilizer Improvements"]*0.05),minY)
 }
 
 function damageEnemy() {
@@ -85,19 +94,19 @@ function damageEnemy() {
 }
 function respawnEnemy() {
   currentenemystats.level++
-  currentenemystats.maxhealth = Math.floor(3 * (1.2 ** currentenemystats.level))
+  currentenemystats.maxhealth = Math.floor(1.1 ** currentenemystats.level)
   currentenemystats.health = currentenemystats.maxhealth
   currentenemystats.dead = false
   moveEnemy()
 }
 function collectReward() {
-  const gain = (1 + boosts["Bounty Multiplier"]) * (1.1 ** boosts["Greater Yield"])
+  const gain = (100000000000000 + boosts["Bounty Multiplier"]) * (1.1 ** boosts["Greater Yield"])
   money.value += gain
   money.value = parseFloat(money.value.toFixed(2))
   respawnEnemy()
 }
 function buyItem(item) {
-  if (money.value >= item.price) {
+  if (money.value >= item.price && boosts[item.item] < item.max) {
     money.value -= item.price
     boosts[item.item]++
     item.price *= 1.25
