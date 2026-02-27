@@ -16,12 +16,12 @@
       <h3>Enemy Level: {{ currentenemystats.level }}</h3>
     </div>
     <div class="collect">Drop Corpse Here</div>
-    <button class="enemy" draggable="true" @dragstart="onDragStart" @click="damageEnemy":style="{ left: enemyPosition.x + 'px', top: enemyPosition.y + 'px' }">
+    <button class="enemy" draggable="true" @dragstart="onDragStart" @click="damageEnemy":style="{ left: enemyPosition.x + 'px', top: enemyPosition.y + 'px', width: boosts[4]+65,height:boosts[4]+35 }">
       <div class="hp-bar">
         <div class="hp-fill":style="{ width: (currentenemystats.health / currentenemystats.maxhealth) * 100 + '%' }" ></div>
       </div>
-      <span v-if="!currentenemystats.dead">HP: {{ currentenemystats.health }}/{{ currentenemystats.maxhealth }}</span>
-      <span v-else>Drag to Collect</span>
+      <div v-if="!currentenemystats.dead">HP: {{ currentenemystats.health }}/{{ currentenemystats.maxhealth }}</div>
+      <div v-else>Drag to Collect</div>
     </button>
   </div>
 </template>
@@ -50,22 +50,29 @@ const shop = reactive([
   },
   {
     item: 'Tranquilizer Improvements',
-    effect: "Decreases the enemy's movement area by +5%",
+    effect: "Limits the enemy's movement area by +1%",
     price: 15,
-    max: 15
-  }
+    max: 45
+  },
+  {
+    item: 'Shotgun Radius Augments',
+    effect: "Increases enemy size",
+    price: 25,
+    max: 10
+  },
 ])
 const boosts = reactive({
   "Bounty Multiplier": 0,
   "Greater Yield": 0,
   "Stronger Ammunition": 0,
   "Tranquilizer Improvements":0,
+  "Shotgun Radius Augments":0
 })
 const currentenemystats = reactive({
   health: 1,
   maxhealth: 1,
   dead: false,
-  level: 1
+  level: 1,
 })
 const enemyPosition = reactive({
   x: window.innerWidth / 2,
@@ -77,10 +84,10 @@ function moveEnemy() {
   const padding = 200
   const maxX = window.innerWidth - padding
   const maxY = window.innerHeight - padding
-  const minX = maxX * (boosts["Tranquilizer Improvements"]*0.05)
-  const minY = maxY * (boosts["Tranquilizer Improvements"]*0.05)
-  enemyPosition.x = Math.max((Math.random() * maxX) * (1-boosts["Tranquilizer Improvements"]*0.05),minX)
-  enemyPosition.y = Math.max((Math.random() * maxY) * (1-boosts["Tranquilizer Improvements"]*0.05),minY)
+  const minX = maxX * (boosts["Tranquilizer Improvements"]/100)
+  const minY = maxY * (boosts["Tranquilizer Improvements"]/100)
+  enemyPosition.x = ((maxX-2*minX)*Math.random())+minX
+  enemyPosition.y = ((maxY-2*minY)*Math.random())+2*minY
 }
 
 function damageEnemy() {
@@ -97,9 +104,11 @@ function respawnEnemy() {
   currentenemystats.maxhealth = Math.floor(1.1 ** currentenemystats.level)
   currentenemystats.health = currentenemystats.maxhealth
   currentenemystats.dead = false
+
   moveEnemy()
 }
 function collectReward() {
+  // debug obv it wont be 100000000000000 money
   const gain = (100000000000000 + boosts["Bounty Multiplier"]) * (1.1 ** boosts["Greater Yield"])
   money.value += gain
   money.value = parseFloat(money.value.toFixed(2))
@@ -178,8 +187,8 @@ onMounted(() => {
 }
 .enemy {
   position: absolute;
-  width: 180px;
-  height: 100px;
+  width: 65px;
+  height: 35px;
   border-radius: 12px;
   background: #8b0000;
   border: none;
