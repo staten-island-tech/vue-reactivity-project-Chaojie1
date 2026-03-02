@@ -16,7 +16,7 @@
       <h3>Enemy Level: {{ currentenemystats.level }}</h3>
     </div>
     <div class="collect">Drop Corpse Here</div>
-    <button class="enemy" draggable="true" @dragstart="onDragStart" @click="damageEnemy":style="{ left: enemyPosition.x + 'px', top: enemyPosition.y + 'px', width: boosts[4]+65,height:boosts[4]+35 }">
+    <button width="{{boosts[4]+65}}" height="{{boosts[4]+35}}" class="enemy" draggable="true" @dragstart="onDragStart" @click="damageEnemy":style="{ left: enemyPosition.x + 'px', top: enemyPosition.y + 'px' }">
       <div class="hp-bar">
         <div class="hp-fill":style="{ width: (currentenemystats.health / currentenemystats.maxhealth) * 100 + '%' }" ></div>
       </div>
@@ -187,8 +187,6 @@ onMounted(() => {
 }
 .enemy {
   position: absolute;
-  width: 65px;
-  height: 35px;
   border-radius: 12px;
   background: #8b0000;
   border: none;
