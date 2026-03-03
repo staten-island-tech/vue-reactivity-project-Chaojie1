@@ -16,7 +16,7 @@
       <h3>Enemy Level: {{ currentenemystats.level }}</h3>
     </div>
     <div class="collect">Drop Corpse Here</div>
-    <button width="{{boosts[4]+65}}" height="{{boosts[4]+35}}" class="enemy" draggable="true" @dragstart="onDragStart" @click="damageEnemy":style="{ left: enemyPosition.x + 'px', top: enemyPosition.y + 'px' }">
+    <button class="enemy" draggable="true" @dragstart="onDragStart" @click="damageEnemy":style="{ left: enemyPosition.x + 'px', top: enemyPosition.y + 'px', width: (3*boosts['Shotgun Radius Augments'] + 65) + 'px', height: (3*boosts['Shotgun Radius Augments'] + 35) + 'px'}">
       <div class="hp-bar">
         <div class="hp-fill":style="{ width: (currentenemystats.health / currentenemystats.maxhealth) * 100 + '%' }" ></div>
       </div>
@@ -58,7 +58,7 @@ const shop = reactive([
     item: 'Shotgun Radius Augments',
     effect: "Increases enemy size",
     price: 25,
-    max: 10
+    max: 50
   },
 ])
 const boosts = reactive({
@@ -87,7 +87,7 @@ function moveEnemy() {
   const minX = maxX * (boosts["Tranquilizer Improvements"]/100)
   const minY = maxY * (boosts["Tranquilizer Improvements"]/100)
   enemyPosition.x = ((maxX-2*minX)*Math.random())+minX
-  enemyPosition.y = ((maxY-2*minY)*Math.random())+2*minY
+  enemyPosition.y = ((maxY-2*minY)*Math.random())+minY
 }
 
 function damageEnemy() {
