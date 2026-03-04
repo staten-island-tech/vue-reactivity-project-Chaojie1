@@ -12,7 +12,7 @@
     <button class="toggle-shop" @click="shopopen = !shopopen">{{ shopopen ? "Close Shop" : "Open Shop" }}</button>
     <div class="stats">
       <h3>Money: ${{ money.toFixed(2) }}</h3>
-      <h3>Money Gain: ${{ ((1 + boosts["Bounty Multiplier"])*(1.1 ** boosts["Greater Yield"])).toFixed(2) }}</h3>
+      <h3>Money Gain: ${{tetrate(((1 + boosts["Bounty Multiplier"]) * (1.1 ** boosts["Greater Yield"]))**((1+boosts["Gold Transmuter"]/100)*(1.01**boosts["Hyperinflation Machine"])),boosts["Galactic Threats"])}}</h3>
       <h3>Enemy Level: {{ currentenemystats.level }}</h3>
     </div>
     <div class="collect">Drop Corpse Here</div>
@@ -60,13 +60,34 @@ const shop = reactive([
     price: 25,
     max: 50
   },
+  {
+    item: 'Gold Transmuter',
+    effect: "Increases money gain by +^0.01",
+    price: 100000,
+    max: 99999999999999999999999999999999999999999
+  },
+  {
+    item: 'Hyperinflation Machine',
+    effect: "Increases exponential money gain by 1.01x compounding",
+    price: 10000000,
+    max: 50
+  },
+  {
+    item: 'Galactic Threats',
+    effect: "Increases money gain by +^^0.01 (Tetration) at the cost of increasing enemy scaling by 10%",
+    price: 10000000,
+    max: 50
+  },
 ])
 const boosts = reactive({
   "Bounty Multiplier": 0,
   "Greater Yield": 0,
   "Stronger Ammunition": 0,
   "Tranquilizer Improvements":0,
-  "Shotgun Radius Augments":0
+  "Shotgun Radius Augments":0,
+  "Gold Transmuter":0,
+  "Hyperinflation Machine":0,
+  "Galactic Threats":0
 })
 const currentenemystats = reactive({
   health: 1,
@@ -101,7 +122,7 @@ function damageEnemy() {
 }
 function respawnEnemy() {
   currentenemystats.level++
-  currentenemystats.maxhealth = Math.floor(1.1 ** currentenemystats.level)
+  currentenemystats.maxhealth = Math.floor(1+(1.01 ** currentenemystats.level)*(1+(boosts["Galactic Threats"]/10)**currentenemystats.level))
   currentenemystats.health = currentenemystats.maxhealth
   currentenemystats.dead = false
 
@@ -109,7 +130,7 @@ function respawnEnemy() {
 }
 function collectReward() {
   // debug obv it wont be 100000000000000 money
-  const gain = (100000000000000 + boosts["Bounty Multiplier"]) * (1.1 ** boosts["Greater Yield"])
+  const gain = ((100000000000000 + boosts["Bounty Multiplier"]) * (1.1 ** boosts["Greater Yield"]))**((1+boosts["Gold Transmuter"]/100)*(1.01**boosts["Hyperinflation Machine"]))
   money.value += gain
   money.value = parseFloat(money.value.toFixed(2))
   respawnEnemy()
@@ -125,6 +146,13 @@ function onDragStart(event) {
   if (!currentenemystats.dead) {
     event.preventDefault()
   }
+}
+function tetrate(num,amt){
+  let curnum = num
+  for (let i=0;i<amt*100;i++){
+    curnum^=(curnum/100)
+  }
+  return curnum
 }
 onMounted(() => {
   const zone = document.querySelector('.collect')
