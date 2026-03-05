@@ -12,11 +12,12 @@
     <button class="toggle-shop" @click="shopopen = !shopopen">{{ shopopen ? "Close Shop" : "Open Shop" }}</button>
     <div class="stats">
       <h3>Money: ${{ money.toFixed(2) }}</h3>
-      <h3>Money Gain: ${{tetrate(((1 + boosts["Bounty Multiplier"]) * (1.1 ** boosts["Greater Yield"]))**((1+boosts["Gold Transmuter"]/100)*(1.01**boosts["Hyperinflation Machine"])),boosts["Galactic Threats"])}}</h3>
+      <h3>Money Gain: ${{(((1+boosts['Bounty Multiplier'])*(1.1**boosts['Greater Yield']))**((1+boosts['Gold Transmuter']/100)*(1.01^boosts["Hyperinflation Machine"])))**(1+boosts['Galactic Threats']/100)}}</h3>
+      <h3>Formula: ( ( ({{boosts["Bounty Multiplier"]}} BM + 1) * (1.1 ^ {{boosts["Greater Yield"]}} GY) ) ^ ( ({{boosts["Gold Transmuter"]}} GoT / 100 + 1) * (1.01 ^ {{boosts["Hyperinflation Machine"]}} HM) ) ) ^ ({{boosts["Galactic Threats"]}} GaT / 20 + 1)</h3>
       <h3>Enemy Level: {{ currentenemystats.level }}</h3>
     </div>
     <div class="collect">Drop Corpse Here</div>
-    <button class="enemy" draggable="true" @dragstart="onDragStart" @click="damageEnemy":style="{ left: enemyPosition.x + 'px', top: enemyPosition.y + 'px', width: (3*boosts['Shotgun Radius Augments'] + 65) + 'px', height: (3*boosts['Shotgun Radius Augments'] + 35) + 'px'}">
+    <button class="enemy" draggable="true" @dragstart="onDragStart" @click="damageEnemy":style="{ left: enemyPosition.x + 'px', top: enemyPosition.y + 'px', width: ((3*boosts['Shot Radius Augments'] + 65)*(1-boosts['Galactic Threats']/100)) + 'px', height: ((3*boosts['Shot Radius Augments'] + 35)*(1-boosts['Galactic Threats']/100)) + 'px'}">
       <div class="hp-bar">
         <div class="hp-fill":style="{ width: (currentenemystats.health / currentenemystats.maxhealth) * 100 + '%' }" ></div>
       </div>
@@ -28,7 +29,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 const shopopen = ref(false)
-const money = ref(0)
+const money = ref(999999999999999)
 const shop = reactive([
   {
     item: 'Bounty Multiplier',
@@ -55,7 +56,7 @@ const shop = reactive([
     max: 45
   },
   {
-    item: 'Shotgun Radius Augments',
+    item: 'Shot Radius Augments',
     effect: "Increases enemy size",
     price: 25,
     max: 50
@@ -74,7 +75,7 @@ const shop = reactive([
   },
   {
     item: 'Galactic Threats',
-    effect: "Increases money gain by +^^0.01 (Tetration) at the cost of increasing enemy scaling by 10%",
+    effect: "Increases resulting money gain by +^0.01 at the cost of increasing enemy health scaling by 10% and decreasing enemy size by 1%",
     price: 10000000,
     max: 50
   },
@@ -84,7 +85,7 @@ const boosts = reactive({
   "Greater Yield": 0,
   "Stronger Ammunition": 0,
   "Tranquilizer Improvements":0,
-  "Shotgun Radius Augments":0,
+  "Shot Radius Augments":0,
   "Gold Transmuter":0,
   "Hyperinflation Machine":0,
   "Galactic Threats":0
@@ -130,7 +131,7 @@ function respawnEnemy() {
 }
 function collectReward() {
   // debug obv it wont be 100000000000000 money
-  const gain = ((100000000000000 + boosts["Bounty Multiplier"]) * (1.1 ** boosts["Greater Yield"]))**((1+boosts["Gold Transmuter"]/100)*(1.01**boosts["Hyperinflation Machine"]))
+  const gain = (((1+boosts['Bounty Multiplier'])*(1.1**boosts['Greater Yield']))**((1+boosts['Gold Transmuter']/100)*(1.01^boosts["Hyperinflation Machine"])))**(1+boosts['Galactic Threats']/20)
   money.value += gain
   money.value = parseFloat(money.value.toFixed(2))
   respawnEnemy()
@@ -146,13 +147,6 @@ function onDragStart(event) {
   if (!currentenemystats.dead) {
     event.preventDefault()
   }
-}
-function tetrate(num,amt){
-  let curnum = num
-  for (let i=0;i<amt*100;i++){
-    curnum^=(curnum/100)
-  }
-  return curnum
 }
 onMounted(() => {
   const zone = document.querySelector('.collect')
