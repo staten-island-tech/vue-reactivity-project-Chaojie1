@@ -12,8 +12,7 @@
     <button class="toggle-shop" @click="shopopen = !shopopen">{{ shopopen ? "Close Shop" : "Open Shop" }}</button>
     <div class="stats">
       <h3>Money: ${{ money.toFixed(2) }}</h3>
-      <h3>Money Gain: ${{(((1+boosts['Bounty Multiplier'])*(1.1**boosts['Greater Yield']))**((1+boosts['Gold Transmuter']/100)*(1.01^boosts["Hyperinflation Machine"])))**(1+boosts['Galactic Threats']/100)}}</h3>
-      <h3>Formula: ( ( ({{boosts["Bounty Multiplier"]}} BM + 1) * (1.1 ^ {{boosts["Greater Yield"]}} GY) ) ^ ( ({{boosts["Gold Transmuter"]}} GoT / 100 + 1) * (1.01 ^ {{boosts["Hyperinflation Machine"]}} HM) ) ) ^ ({{boosts["Galactic Threats"]}} GaT / 20 + 1)</h3>
+      <h3>Money Gain: ${{((((1+boosts['Bounty Multiplier']*(boosts['Paragon Bonus']/200+1))*((1.1*(boosts['Paragon Bonus']/200+1))**boosts['Greater Yield']))**((1+(boosts['Gold Transmuter']/20)*(boosts['Paragon Bonus']/200+1))*((1.05*(boosts['Paragon Bonus']/200+1))**boosts["Hyperinflation Machine"])))**(1+(boosts['Galactic Threats']/50)*(boosts['Paragon Bonus']/200+1))).toFixed(2)}}</h3>
       <h3>Enemy Level: {{ currentenemystats.level }}</h3>
     </div>
     <div class="collect">Drop Corpse Here</div>
@@ -44,6 +43,30 @@ const shop = reactive([
     max: 999999
   },
   {
+    item: 'Gold Transmuter',
+    effect: "Increases money gain by +^0.05",
+    price: 100000,
+    max: 99999999999999999999999999999999999999999
+  },
+  {
+    item: 'Hyperinflation Machine',
+    effect: "Increases exponential money gain by 1.05x compounding",
+    price: 10000000,
+    max: 100
+  },
+  {
+    item: 'Galactic Threats',
+    effect: "Increases resulting money gain by +^0.02 at the cost of increasing enemy health scaling by 10% and decreasing enemy size by 1%",
+    price: 1000000000,
+    max: 50
+  },
+  {
+    item: 'Paragon Bonus',
+    effect: "Increases every upgrade bonus by 1.005x",
+    price: 100000000000,
+    max: 9
+  },
+  {
     item: 'Stronger Ammunition',
     effect: "Deal 1 extra damage per shot",
     price: 10,
@@ -61,24 +84,6 @@ const shop = reactive([
     price: 25,
     max: 50
   },
-  {
-    item: 'Gold Transmuter',
-    effect: "Increases money gain by +^0.01",
-    price: 100000,
-    max: 99999999999999999999999999999999999999999
-  },
-  {
-    item: 'Hyperinflation Machine',
-    effect: "Increases exponential money gain by 1.01x compounding",
-    price: 10000000,
-    max: 50
-  },
-  {
-    item: 'Galactic Threats',
-    effect: "Increases resulting money gain by +^0.01 at the cost of increasing enemy health scaling by 10% and decreasing enemy size by 1%",
-    price: 10000000,
-    max: 50
-  },
 ])
 const boosts = reactive({
   "Bounty Multiplier": 0,
@@ -88,7 +93,8 @@ const boosts = reactive({
   "Shot Radius Augments":0,
   "Gold Transmuter":0,
   "Hyperinflation Machine":0,
-  "Galactic Threats":0
+  "Galactic Threats":0,
+  "Paragon Bonus":0
 })
 const currentenemystats = reactive({
   health: 1,
@@ -131,7 +137,7 @@ function respawnEnemy() {
 }
 function collectReward() {
   // debug obv it wont be 100000000000000 money
-  const gain = (((1+boosts['Bounty Multiplier'])*(1.1**boosts['Greater Yield']))**((1+boosts['Gold Transmuter']/100)*(1.01^boosts["Hyperinflation Machine"])))**(1+boosts['Galactic Threats']/20)
+  const gain = (((1+boosts['Bounty Multiplier'])*(1.1**boosts['Greater Yield']))**((1+boosts['Gold Transmuter']/100)*(1.01**boosts["Hyperinflation Machine"])))**(1+boosts['Galactic Threats']/100)
   money.value += gain
   money.value = parseFloat(money.value.toFixed(2))
   respawnEnemy()
