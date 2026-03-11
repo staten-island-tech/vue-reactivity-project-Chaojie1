@@ -28,7 +28,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 const shopopen = ref(false)
-const money = ref(999999999999999)
+const money = ref(0)
 const shop = reactive([
   {
     item: 'Bounty Multiplier',
@@ -136,7 +136,6 @@ function respawnEnemy() {
   moveEnemy()
 }
 function collectReward() {
-  // debug obv it wont be 100000000000000 money
   const gain = (((1+boosts['Bounty Multiplier'])*(1.1**boosts['Greater Yield']))**((1+boosts['Gold Transmuter']/100)*(1.01**boosts["Hyperinflation Machine"])))**(1+boosts['Galactic Threats']/100)
   money.value += gain
   money.value = parseFloat(money.value.toFixed(2))
